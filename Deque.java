@@ -60,7 +60,7 @@ public class Deque<Item> implements Iterable<Item> {
 
     // create new last node
     last = new Node<Item>();
-    
+
     // set references for new last
     last.item = item;
     last.next = null;
@@ -74,6 +74,46 @@ public class Deque<Item> implements Iterable<Item> {
       oldLast.next = last;
     }
     size++;
+  }
+
+  public Item removeFirst() {
+    if (isEmpty()) {
+      throw new NoSuchElementException("Deque is empty");
+    }
+    // save old first node
+    Item item = first.item;
+    // set first to old first next
+    first = first.next;
+    size--;
+
+    if (isEmpty()) {
+      // if deque is empty, set last to null
+      last = null;
+    } else {
+      // if deque is not empty, set first prev to null
+      first.prev = null;
+    }
+    return item;
+  }
+
+  public Item removeLast() {
+    if (isEmpty()) {
+      throw new NoSuchElementException("Deque is empty");
+    }
+
+    // save old last node
+    Item item = last.item;
+    // set last to old last prev
+    last = last.prev;
+    size--;
+    if (isEmpty()) {
+      // if deque is empty, set first to null
+      first = null;
+    } else {
+      // if deque is not empty, set last next to null
+      last.next = null;
+    }
+    return item;
   }
 
   public Iterator<Item> iterator() {
