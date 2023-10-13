@@ -11,6 +11,12 @@ public class Deque<Item> implements Iterable<Item> {
     private Node<Item> prev;
   }
 
+     public Deque() {
+        first = null;
+        last = null;
+        size = 0;
+    }
+
   public Iterator<Item> iterator() {
     return new DequeIterator<Item>(first);
   }
