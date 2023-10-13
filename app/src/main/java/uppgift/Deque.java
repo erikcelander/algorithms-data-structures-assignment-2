@@ -1,3 +1,5 @@
+package uppgift;
+
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -123,11 +125,13 @@ public class Deque<Item> implements Iterable<Item> {
   private class DequeIterator<T> implements Iterator<Item> {
     private Node<Item> current;
 
+    // constructor
     public DequeIterator(Node<Item> first) {
       current = first;
     }
 
     public boolean hasNext() {
+      // if current is null, there is no next
       return current != null;
     }
 
@@ -135,13 +139,70 @@ public class Deque<Item> implements Iterable<Item> {
       if (!hasNext()) {
         throw new NoSuchElementException();
       }
+
+      // save current item
       Item item = current.item;
+      // set current to current next
       current = current.next;
+      // return saved item
       return item;
     }
 
-    public void remove() {
-      throw new UnsupportedOperationException();
-    }
+    
   }
+
+  public static void main(String[] args) {
+    Deque<String> deque = new Deque<String>();
+
+    // Test: isEmpty on an empty deque
+    assert deque.isEmpty() : "Deque should be empty initially";
+
+    // Test: size on an empty deque
+    assert deque.size() == 0 : "Size should be 0 initially";
+
+    // Test: addFirst
+    deque.addFirst("A");
+    assert deque.size() == 1 : "Size should be 1 after adding one item";
+    assert !deque.isEmpty() : "Deque should not be empty after adding an item";
+
+    // Test: addLast
+    deque.addLast("B");
+    assert deque.size() == 2 : "Size should be 2 after adding two items";
+
+    // Test: removeFirst
+    String firstItem = deque.removeFirst();
+    assert firstItem.equals("A") : "Removed item should be 'A'";
+    assert deque.size() == 1 : "Size should be 1 after removing one item";
+
+    // Test: removeLast
+    String lastItem = deque.removeLast();
+    assert lastItem.equals("B") : "Removed item should be 'B'";
+    assert deque.size() == 0 : "Size should be 0 after removing two items";
+
+    // Test: Exception handling
+    try {
+        deque.removeFirst();
+        assert false : "Expected exception when removing from an empty deque";
+    } catch (NoSuchElementException e) {
+        System.out.println(e.getMessage());
+    }
+
+    try {
+        deque.removeLast();
+        assert false : "Expected exception when removing from an empty deque";
+    } catch (NoSuchElementException e) {
+        System.out.println(e.getMessage());
+
+    }
+
+    deque.addFirst("C");
+    deque.addLast("D");
+    Iterator<String> iterator = deque.iterator();
+    assert iterator.hasNext() : "Iterator should have next item";
+    assert iterator.next().equals("C") : "First item from iterator should be 'C'";
+    assert iterator.next().equals("D") : "Second item from iterator should be 'D'";
+    assert !iterator.hasNext() : "Iterator should not have more items";
+
+    System.out.println("All tests passed!");
+}
 }
