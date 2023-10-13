@@ -1,4 +1,5 @@
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 public class Deque<Item> implements Iterable<Item> {
   private Node<Item> first;
@@ -25,7 +26,82 @@ public class Deque<Item> implements Iterable<Item> {
     return size;
   }
 
+  public void addFirst(Item item) {
+    if (item == null) {
+      throw new IllegalArgumentException("Item cannot be null");
+    }
+
+    // save old first node
+    Node<Item> oldFirst = first;
+
+    // create new first node
+    first = new Node<Item>();
+
+    // set referencences for new first
+    first.item = item;
+    first.next = oldFirst;
+    first.prev = null;
+    if (isEmpty()) {
+      // if deque is empty, set last to first
+      last = first;
+    } else {
+      // if deque is not empty, set old first prev to new first
+      oldFirst.prev = first;
+    }
+    size++;
+  }
+
+  public void addLast(Item item) {
+    if (item == null) {
+      throw new IllegalArgumentException("Item cannot be null");
+    }
+    // save old last node
+    Node<Item> oldLast = last;
+
+    // create new last node
+    last = new Node<Item>();
+    
+    // set references for new last
+    last.item = item;
+    last.next = null;
+    last.prev = oldLast;
+
+    if (isEmpty()) {
+      // if deque is empty, set first to last
+      first = last;
+    } else {
+      // if deque is not empty, set old last next to new last
+      oldLast.next = last;
+    }
+    size++;
+  }
+
   public Iterator<Item> iterator() {
     return new DequeIterator<Item>(first);
+  }
+
+  private class DequeIterator<T> implements Iterator<Item> {
+    private Node<Item> current;
+
+    public DequeIterator(Node<Item> first) {
+      current = first;
+    }
+
+    public boolean hasNext() {
+      return current != null;
+    }
+
+    public Item next() {
+      if (!hasNext()) {
+        throw new NoSuchElementException();
+      }
+      Item item = current.item;
+      current = current.next;
+      return item;
+    }
+
+    public void remove() {
+      throw new UnsupportedOperationException();
+    }
   }
 }
