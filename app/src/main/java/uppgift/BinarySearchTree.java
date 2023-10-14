@@ -30,6 +30,35 @@ public class BinarySearchTree<Item extends Comparable<Item>> {
     return x.size;
   }
 
+  public Node add(Item item) {
+    root = add(root, item);
+    return root;
+  }
+
+  private Node add(Node x, Item item) {
+    if (x == null) {
+      return new Node(item);
+    }
+
+    // compare item to x.item
+    int cmp = item.compareTo(x.item);
+    if (cmp < 0) {
+      // if item is less than x.item, go left
+      x.left = add(x.left, item);
+    } else if (cmp > 0) {
+      // if item is greater than x.item, go right
+      x.right = add(x.right, item);
+    } else {
+      // if item is equal to x.item, update x.item
+      x.item = item;
+    }
+
+    // update size
+    x.size = 1 + size(x.left) + size(x.right);
+
+    return x;
+  }
+
   public Item contains(Item item) {
     return contains(root, item);
   }
@@ -38,12 +67,17 @@ public class BinarySearchTree<Item extends Comparable<Item>> {
     if (x == null) {
       return null;
     }
+
+    // compare item to x.item
     int cmp = item.compareTo(x.item);
     if (cmp < 0) {
+      // if item is less than x.item, go left
       return contains(x.left, item);
     } else if (cmp > 0) {
+      // if item is greater than x.item, go right
       return contains(x.right, item);
     } else {
+      // if item is equal to x.item, return x.item
       return x.item;
     }
   }

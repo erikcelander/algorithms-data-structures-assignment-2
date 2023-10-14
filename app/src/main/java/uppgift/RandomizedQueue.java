@@ -9,7 +9,6 @@ import java.util.Collections;
 public class RandomizedQueue<Item> implements Iterable<Item> {
   private ArrayList<Item> items;
 
-  // init empty arraylist in constructor
   public RandomizedQueue() {
     items = new ArrayList<Item>();
   }
