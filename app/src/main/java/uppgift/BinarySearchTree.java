@@ -30,4 +30,22 @@ public class BinarySearchTree<Item extends Comparable<Item>> {
     return x.size;
   }
 
+  public Item contains(Item item) {
+    return contains(root, item);
+  }
+
+  private Item contains(Node x, Item item) {
+    if (x == null) {
+      return null;
+    }
+    int cmp = item.compareTo(x.item);
+    if (cmp < 0) {
+      return contains(x.left, item);
+    } else if (cmp > 0) {
+      return contains(x.right, item);
+    } else {
+      return x.item;
+    }
+  }
+
 }
