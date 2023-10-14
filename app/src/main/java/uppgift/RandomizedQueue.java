@@ -1,72 +1,104 @@
 package uppgift;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Random;
+import java.util.Arrays;
 import java.util.Collections;
 
 public class RandomizedQueue<Item> implements Iterable<Item> {
-  private ArrayList<Item> items;
+  private Item[] items;
+  private int size;
+  private final Random random = new Random();
 
+  @SuppressWarnings("unchecked")
   public RandomizedQueue() {
-    items = new ArrayList<Item>();
+    items = (Item[]) new Object[1];
+    size = 0;
   }
 
   public boolean isEmpty() {
-    return items.isEmpty();
+    return size == 0;
   }
 
   public int size() {
-    return items.size();
+    return size;
   }
 
-  // add item to end of arraylist
   public void enqueue(Item item) {
     if (item == null) {
       throw new IllegalArgumentException("Item cannot be null");
     }
-    items.add(item);
+
+    // resize array if necessary
+    if (size == items.length) {
+      resize(2 * items.length);
+    }
+
+    // add item to end of array
+    items[size++] = item;
   }
 
-  // remove random item from arraylist
   public Item dequeue() {
     if (isEmpty()) {
       throw new NoSuchElementException("Queue is empty");
     }
-    // get random index and remove item at that index
-    int randomIndex = new Random().nextInt(items.size());
-    Item item = items.get(randomIndex);
-    items.remove(randomIndex);
+    // get random index and use it to get random item
+    int randomIndex = random.nextInt(size);
+    Item item = items[randomIndex];
+
+    size--;
+
+    // replace random item with last item in array
+    items[randomIndex] = items[size];
+    items[size] = null;
+
+    // resize array if necessary
+    if (size > 0 && size == items.length / 4) {
+      resize(items.length / 2);
+    }
     return item;
   }
 
   public Iterator<Item> iterator() {
-    return new RandomizedQueueIterator(items);
+    return new RandomizedQueueIterator();
+  }
+
+  @SuppressWarnings("unchecked")
+  private void resize(int capacity) {
+    Item[] copy = (Item[]) new Object[capacity];
+    for (int i = 0; i < size; i++) {
+      copy[i] = items[i];
+    }
+    items = copy;
   }
 
   private class RandomizedQueueIterator implements Iterator<Item> {
-    private ArrayList<Item> shuffledItems;
-    private int index;
+    private int current;
+    private int[] indices;
 
-    // copy items to new arraylist and shuffle it
-    public RandomizedQueueIterator(ArrayList<Item> items) {
-      shuffledItems = new ArrayList<Item>(items);
-      Collections.shuffle(shuffledItems);
-      index = 0;
+    public RandomizedQueueIterator() {
+      current = 0;
+      indices = new int[size];
+      for (int i = 0; i < size; i++) {
+        indices[i] = i;
+      }
+      Collections.shuffle(Arrays.asList(indices), random);
     }
 
-    // check if there are more items to iterate over
     public boolean hasNext() {
-      return index < shuffledItems.size();
+      return current < size;
     }
 
-    // return next item in shuffled arraylist
     public Item next() {
       if (!hasNext()) {
-        throw new NoSuchElementException();
+        throw new NoSuchElementException("No more items to return");
       }
-      return shuffledItems.get(index++);
+      return items[indices[current++]];
+    }
+
+    public void remove() {
+      throw new UnsupportedOperationException("not supported");
     }
   }
 
@@ -93,7 +125,8 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     assert queue.size() == 1 : "Size should be 1 after dequeuing one item";
 
     String secondItem = queue.dequeue();
-    assert (secondItem.equals("A") || secondItem.equals("B")) && !secondItem.equals(firstItem)
+    assert (secondItem.equals("A") || secondItem.equals("B")) &&
+        !secondItem.equals(firstItem)
         : "Dequeued item should be the one not dequeued before";
     assert queue.size() == 0 : "Size should be 0 after dequeuing two items";
 
@@ -113,7 +146,8 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     String firstIterItem = iterator.next();
     assert (firstIterItem.equals("C") || firstIterItem.equals("D")) : "First item from iterator should be 'C' or 'D'";
     String secondIterItem = iterator.next();
-    assert (secondIterItem.equals("C") || secondIterItem.equals("D")) && !secondIterItem.equals(firstIterItem)
+    assert (secondIterItem.equals("C") || secondIterItem.equals("D")) &&
+        !secondIterItem.equals(firstIterItem)
         : "Second item from iterator should be the one not returned before";
     assert !iterator.hasNext() : "Iterator should not have more items";
 
