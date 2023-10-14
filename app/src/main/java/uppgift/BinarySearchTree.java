@@ -82,4 +82,58 @@ public class BinarySearchTree<Item extends Comparable<Item>> {
     }
   }
 
+  public int height() {
+    return height(root);
+  }
+
+  private int height(Node x) {
+    if (x == null)
+      return -1; // base case
+
+    // recursive calls
+    return 1 + Math.max(height(x.left), height(x.right));
+  }
+
+  public void remove(Item item) {
+    root = remove(root, item);
+  }
+
+  private Node remove(Node x, Item item) {
+    if (x == null) return null;
+
+    // find node to remove
+    int cmp = item.compareTo(x.item);
+    if (cmp < 0)
+      x.left = remove(x.left, item);
+    else if (cmp > 0)
+      x.right = remove(x.right, item);
+    
+    else {
+      if (x.right == null) return x.left;
+      if (x.left == null) return x.right;
+
+      // replace node with minimum node of right sub-tree
+      Node t = x;
+      x = min(t.right);
+      x.right = deleteMin(t.right);
+      x.left = t.left;
+    }
+    x.size = size(x.left) + size(x.right) + 1;
+    return x;
+  }
+
+  private Node min(Node x) {
+    if (x.left == null)
+      return x;
+    return min(x.left);
+  }
+
+  private Node deleteMin(Node x) {
+    if (x.left == null)
+      return x.right;
+    x.left = deleteMin(x.left);
+    x.size = size(x.left) + size(x.right) + 1;
+    return x;
+  }
+
 }
