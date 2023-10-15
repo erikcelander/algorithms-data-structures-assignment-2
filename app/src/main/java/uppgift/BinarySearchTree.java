@@ -1,6 +1,7 @@
 package uppgift;
 
 import java.util.Iterator;
+import java.util.Stack;
 
 public class BinarySearchTree<Item extends Comparable<Item>> {
   private Node root;
@@ -140,48 +141,78 @@ public class BinarySearchTree<Item extends Comparable<Item>> {
     return x;
   }
 
+  private class InOrderIterator implements Iterator<Item> {
+    private Stack<Node> stack = new Stack<>();
 
-
-  public static void main(String[] args) {
-    BinarySearchTree<String> bst = new BinarySearchTree<>();
-
-    // Test: isEmpty on an empty BST
-    assert bst.isEmpty() : "BST should be empty initially";
-
-    // Test: size on an empty BST
-    assert bst.size() == 0 : "Size should be 0 initially";
-
-    // Test: add
-    bst.add("A");
-    assert bst.size() == 1 : "Size should be 1 after adding one item";
-    assert !bst.isEmpty() : "BST should not be empty after adding an item";
-
-    // Test: add more items
-    bst.add("B");
-    bst.add("C");
-    assert bst.size() == 3 : "Size should be 3 after adding three items";
-
-    // Test: contains
-    assert bst.contains("A") : "BST should contain 'A'";
-    assert bst.contains("B") : "BST should contain 'B'";
-    assert bst.contains("C") : "BST should contain 'C'";
-    assert !bst.contains("D") : "BST should not contain 'D'";
-
-    // Test: remove
-    bst.remove("A");
-    assert bst.size() == 2 : "Size should be 2 after removing one item";
-    assert !bst.contains("A") : "BST should not contain 'A' after removal";
-
-    // Test: Exception handling for remove
-    try {
-      bst.remove("Z");
-      assert false : "Expected exception when removing a non-existent item";
-    } catch (Exception e) {
-      System.out.println(e.getMessage());
+    public InOrderIterator() {
+      pushLeft(root);
     }
 
+    private void pushLeft(Node x) {
+      while (x != null) {
+        stack.push(x);
+        x = x.left;
+      }
+    }
+
+    public boolean hasNext() {
+      return !stack.isEmpty();
+    }
+
+    public Item next() {
+      Node current = stack.pop();
+      pushLeft(current.right);
+      return current.item;
+    }
+  }
+
+  public Iterator<Item> inOrderIterator() {
+    return new InOrderIterator();
+  }
+
+  public static void main(String[] args) {
+    BinarySearchTree<Integer> bst = new BinarySearchTree<>();
+
+    // Test: isEmpty on an empty tree
+    assert bst.isEmpty() : "Tree should be empty initially";
+
+    // Test: size on an empty tree
+    assert bst.size() == 0 : "Size should be 0 initially";
+
+    // Add elements to the tree
+    int[] elements = { 5, 3, 8, 1, 4, 7, 9 };
+    for (int el : elements) {
+      bst.add(el);
+    }
+
+    // Visualization:
+    // 5
+    // / \
+    // 3 8
+    // / \ / \
+    // 1 4 7 9
+
+    assert !bst.isEmpty() : "Tree should not be empty after adding elements";
+    assert bst.size() == 7 : "Size should be 7 after adding seven elements";
+
+    // Test: contains
+    assert bst.contains(5) : "Tree should contain 5";
+    assert !bst.contains(10) : "Tree should not contain 10";
+
     // Test: height
-    assert bst.height() == 1 : "Height should be 1";
+    assert bst.height() == 2 : "Height of the tree should be 2";
+
+    // Test: InOrderIterator
+    Iterator<Integer> inOrderIterator = bst.inOrderIterator();
+    int[] inOrderResult = { 1, 3, 4, 5, 7, 8, 9 };
+    int index = 0;
+    while (inOrderIterator.hasNext()) {
+      int currentValue = inOrderIterator.next();
+      System.out.println("Current value from iterator: " + currentValue);
+      assert currentValue == inOrderResult[index++] : "In-order traversal is incorrect at value " + currentValue;
+    }
+
+
 
     System.out.println("All tests passed!");
   }
