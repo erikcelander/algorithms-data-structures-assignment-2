@@ -26,7 +26,7 @@ dependencies {
 
 application {
     // Define the main class for the application.
-    mainClass = 'uppgift.BinarySearchTree'
+    mainClass = 'uppgift.RedBlackTree'
 }
 
 tasks.named('test') {
