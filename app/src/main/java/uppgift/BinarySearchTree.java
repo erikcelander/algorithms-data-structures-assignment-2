@@ -30,8 +30,8 @@ public class BinarySearchTree<Item extends Comparable<Item>> {
   private int size(Node node) {
     if (node == null) {
       return 0;
-
     }
+
     return node.size;
   }
 
@@ -91,8 +91,9 @@ public class BinarySearchTree<Item extends Comparable<Item>> {
   }
 
   private int height(Node node) {
-    if (node == null)
-      return -1; // base case
+    if (node == null) {
+      return -1;
+    }
 
     // recursive calls
     return 1 + Math.max(height(node.left), height(node.right));
@@ -103,8 +104,9 @@ public class BinarySearchTree<Item extends Comparable<Item>> {
   }
 
   private Node remove(Node node, Item item) {
-    if (node == null)
+    if (node == null) {
       return null;
+    }
 
     // find node to remove
     int cmp = item.compareTo(node.item);
@@ -130,8 +132,11 @@ public class BinarySearchTree<Item extends Comparable<Item>> {
   }
 
   private Node min(Node node) {
-    if (node.left == null)
+    if (node.left == null) {
       return node;
+    }
+
+    // recursive call
     return min(node.left);
   }
 
@@ -159,9 +164,6 @@ public class BinarySearchTree<Item extends Comparable<Item>> {
     // remove the kth largest element
     root = remove(root, kthLargest);
   }
-
-
-
 
   public Iterator<Item> inOrderIterator() {
     return new InOrderIterator();
@@ -193,6 +195,19 @@ public class BinarySearchTree<Item extends Comparable<Item>> {
       pushLeft(current.right);
       return current.item;
     }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      while (this.hasNext()) {
+        output.append(this.next());
+        if (this.hasNext()) {
+          output.append(", ");
+        }
+      }
+      return output.toString();
+    }
+
   }
 
   public Iterator<Item> preOrderIterator() {
@@ -221,6 +236,19 @@ public class BinarySearchTree<Item extends Comparable<Item>> {
         stack.push(current.left);
       return current.item;
     }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      while (this.hasNext()) {
+        output.append(this.next());
+        if (this.hasNext()) {
+          output.append(", ");
+        }
+      }
+      return output.toString();
+    }
+
   }
 
   public Iterator<Item> postOrderIterator() {
@@ -229,7 +257,6 @@ public class BinarySearchTree<Item extends Comparable<Item>> {
 
   private class PostOrderIterator implements Iterator<Item> {
     // use two stacks to implement post-order iteration
-
     // stack will contain nodes to be processed
     private Stack<Node> stack = new Stack<>();
 
@@ -266,42 +293,51 @@ public class BinarySearchTree<Item extends Comparable<Item>> {
       return output.pop().item;
     }
 
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      while (this.hasNext()) {
+        output.append(this.next());
+        if (this.hasNext()) {
+          output.append(", ");
+        }
+      }
+      return output.toString();
+    }
 
-    
-  
   }
 
   public static void main(String[] args) {
-    BinarySearchTree<Integer> bst = new BinarySearchTree<>();
+    BinarySearchTree<Integer> tree = new BinarySearchTree<>();
 
     // Test: isEmpty on an empty tree
-    assert bst.isEmpty() : "Tree should be empty initially";
+    assert tree.isEmpty() : "Tree should be empty initially";
 
     // Test: size on an empty tree
-    assert bst.size() == 0 : "Size should be 0 initially";
+    assert tree.size() == 0 : "Size should be 0 initially";
 
     // Add elements to the tree
-    int[] elements = { 5, 3, 8, 1, 4, 7, 9 };
-    for (int el : elements) {
-      bst.add(el);
+    int[] nodes = { 5, 3, 8, 1, 4, 7, 9 };
+    for (int node : nodes) {
+      tree.add(node);
     }
 
-    assert !bst.isEmpty() : "Tree should not be empty after adding elements";
-    assert bst.size() == 7 : "Size should be 7 after adding seven elements";
+    assert !tree.isEmpty() : "Tree should not be empty after adding elements";
+    assert tree.size() == 7 : "Size should be 7 after adding seven elements";
 
     // Test: contains
-    assert bst.contains(5) : "Tree should contain 5";
-    assert !bst.contains(10) : "Tree should not contain 10";
+    assert tree.contains(5) : "Tree should contain 5";
+    assert !tree.contains(10) : "Tree should not contain 10";
 
     // Test: height
-    assert bst.height() == 2 : "Height of the tree should be 2";
+    assert tree.height() == 2 : "Height of the tree should be 2";
 
     // Print array and tree
     System.out.println();
-    System.out.print("Array: ");
-    for (int i = 0; i < elements.length; i++) {
-      System.out.print(elements[i]);
-      if (i < elements.length - 1) {
+    System.out.print("Nodes: ");
+    for (int i = 0; i < nodes.length; i++) {
+      System.out.print(nodes[i]);
+      if (i < nodes.length - 1) {
         System.out.print(", ");
       }
     }
@@ -316,107 +352,56 @@ public class BinarySearchTree<Item extends Comparable<Item>> {
     System.out.println("   1   4  7   9");
     System.out.println();
 
-
     // Test: InOrderIterator
-    Iterator<Integer> inOrderIterator = bst.inOrderIterator();
+    Iterator<Integer> inOrderIterator = tree.inOrderIterator();
     int[] inOrderExpectedResult = { 1, 3, 4, 5, 7, 8, 9 };
-    int index = 0;
-    StringBuilder inOrderOutput = new StringBuilder("In-order output: ");
-    while (inOrderIterator.hasNext()) {
-      int currentValue = inOrderIterator.next();
-      inOrderOutput.append(currentValue);
-      if (inOrderIterator.hasNext()) {
-        inOrderOutput.append(", ");
-      }
-      assert currentValue == inOrderExpectedResult[index++]
+    for (int currentValue : inOrderExpectedResult) {
+      assert inOrderIterator.next() == currentValue
           : "In-order traversal is incorrect at value " + currentValue;
     }
-    System.out.println(inOrderOutput.toString());
+    System.out.println("In-order output: " + inOrderIterator.toString());
 
     // Test: PreOrderIterator
-    Iterator<Integer> preOrderIterator = bst.preOrderIterator();
-    int[] preOrderExpectedResult = { 5, 3, 1, 8, 7, 4, 9 };
-    index = 0;
-    StringBuilder preOrderOutput = new StringBuilder("Pre-order output: ");
-    while (preOrderIterator.hasNext()) {
-      int currentValue = preOrderIterator.next();
-      preOrderOutput.append(currentValue);
-      if (preOrderIterator.hasNext()) {
-        preOrderOutput.append(", ");
-      }
-      assert currentValue == preOrderExpectedResult[index++]
+    Iterator<Integer> preOrderIterator = tree.preOrderIterator();
+    int[] preOrderExpectedResult = { 5, 3, 1, 8, 7, 4, 9, 10 };
+    for (int currentValue : preOrderExpectedResult) {
+      assert preOrderIterator.next() == currentValue
           : "Pre-order traversal is incorrect at value " + currentValue;
     }
-    System.out.println(preOrderOutput.toString());
+    System.out.println("Pre-order output: " + preOrderIterator.toString());
 
     // Test: PostOrderIterator
-    Iterator<Integer> postOrderIterator = bst.postOrderIterator();
+    Iterator<Integer> postOrderIterator = tree.postOrderIterator();
     int[] postOrderExpectedResult = { 1, 4, 3, 7, 9, 8, 5 };
-    index = 0;
-    StringBuilder postOrderOutput = new StringBuilder("Post-order output: ");
-    while (postOrderIterator.hasNext()) {
-      int currentValue = postOrderIterator.next();
-      postOrderOutput.append(currentValue);
-      if (postOrderIterator.hasNext()) {
-        postOrderOutput.append(", ");
-      }
-      assert currentValue == postOrderExpectedResult[index++]
+    for (int currentValue : postOrderExpectedResult) {
+      assert postOrderIterator.next() == currentValue
           : "Post-order traversal is incorrect at value " + currentValue;
     }
-    System.out.println(postOrderOutput.toString());
+    System.out.println("Post-order output: " + postOrderIterator.toString());
 
     System.out.println();
     System.out.println();
+
     System.out.println("--------------------------------------");
     System.out.println();
     System.out.println();
 
-    BinarySearchTree<Integer> bst2 = new BinarySearchTree<>();
+    // Test: RemoveKthLargest
+    // Test: InOrderIterator before removing the third largest number
+    inOrderIterator = tree.inOrderIterator();
+    System.out.println("In-order output before removing third largest number:");
+    System.out.println(inOrderIterator.toString());
 
-    int[] array = { 5, 3, 8, 2, 4, 7, 9, 1, 6, 10 };
+    // Remove the third largest number
+    tree.removeKthLargest(3);
 
-    for (int el : array) {
-        bst2.add(el);
-    }
-
-    
-    
-    // Print the array
-    System.out.print("Array: ");
-    for (int i = 0; i < array.length; i++) {
-        System.out.print(array[i]);
-        if (i < array.length - 1) {
-            System.out.print(", ");
-        }
-    }
-
+    // Test: InOrderIterator after removing the third largest number
+    inOrderIterator = tree.inOrderIterator(); // Create a new instance of the iterator
+    System.out.println("In-order output after removing third largest number:");
+    System.out.println(inOrderIterator.toString());
 
     System.out.println();
-    System.out.println("Tree:");
-    System.out.println("        5");
-    System.out.println("      /   \\");
-    System.out.println("     3     8");
-    System.out.println("    / \\   / \\");
-    System.out.println("   2   4 7   9");
-    System.out.println("  /         / \\");
-    System.out.println(" 1         6   10");
-    
-    // Remove the kth largest value
-    bst2.removeKthLargest(3);
-    
     System.out.println();
-    System.out.println("Tree after removing 3rd largest value:");
-    System.out.println("        5");
-    System.out.println("      /   \\");
-    System.out.println("     3     7");
-    System.out.println("    / \\     \\");
-    System.out.println("   2   4     9");
-    System.out.println("  /         / \\");
-    System.out.println(" 1         6   10");
-    
-    System.out.println();
-
- 
     System.out.println("All tests passed!");
   }
 }
