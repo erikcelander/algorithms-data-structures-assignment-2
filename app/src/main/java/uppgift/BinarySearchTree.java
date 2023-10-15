@@ -42,16 +42,16 @@ public class BinarySearchTree<Item extends Comparable<Item>> {
       return new Node(item);
     }
 
-    // compare item to x.item
+    // compare item to node.item
     int compare = item.compareTo(node.item);
     if (compare < 0) {
-      // if item is less than x.item, go left
+      // if item is less than node.item, go left
       node.left = add(node.left, item);
     } else if (compare > 0) {
-      // if item is greater than x.item, go right
+      // if item is greater than node.item, go right
       node.right = add(node.right, item);
     } else {
-      // if item is equal to x.item, update x.item
+      // if item is equal to node.item, update node.item
       node.item = item;
     }
 
@@ -70,16 +70,16 @@ public class BinarySearchTree<Item extends Comparable<Item>> {
       return null;
     }
 
-    // compare item to x.item
+    // compare item to node.item
     int compare = item.compareTo(node.item);
     if (compare < 0) {
-      // if item is less than x.item, go left
+      // if item is less than node.item, go left
       return contains(node.left, item);
     } else if (compare > 0) {
-      // if item is greater than x.item, go right
+      // if item is greater than node.item, go right
       return contains(node.right, item);
     } else {
-      // if item is equal to x.item, return x.item
+      // if item is equal to node.item, return node.item
       return node.item;
     }
   }
@@ -127,18 +127,18 @@ public class BinarySearchTree<Item extends Comparable<Item>> {
     return node;
   }
 
-  private Node min(Node x) {
-    if (x.left == null)
-      return x;
-    return min(x.left);
+  private Node min(Node node) {
+    if (node.left == null)
+      return node;
+    return min(node.left);
   }
 
-  private Node deleteMin(Node x) {
-    if (x.left == null)
-      return x.right;
-    x.left = deleteMin(x.left);
-    x.size = size(x.left) + size(x.right) + 1;
-    return x;
+  private Node deleteMin(Node node) {
+    if (node.left == null)
+      return node.right;
+    node.left = deleteMin(node.left);
+    node.size = size(node.left) + size(node.right) + 1;
+    return node;
   }
 
   private class InOrderIterator implements Iterator<Item> {
@@ -148,17 +148,20 @@ public class BinarySearchTree<Item extends Comparable<Item>> {
       pushLeft(root);
     }
 
-    private void pushLeft(Node x) {
-      while (x != null) {
-        stack.push(x);
-        x = x.left;
+    // push all left nodes to stack
+    private void pushLeft(Node node) {
+      while (node != null) {
+        stack.push(node);
+        node = node.left;
       }
     }
 
+    // check if stack is not empty
     public boolean hasNext() {
       return !stack.isEmpty();
     }
 
+    // pop node from stack and push all left nodes of right child to stack
     public Item next() {
       Node current = stack.pop();
       pushLeft(current.right);
@@ -168,6 +171,34 @@ public class BinarySearchTree<Item extends Comparable<Item>> {
 
   public Iterator<Item> inOrderIterator() {
     return new InOrderIterator();
+  }
+
+  private class PreOrderIterator implements Iterator<Item> {
+    private Stack<Node> stack = new Stack<>();
+
+    public PreOrderIterator() {
+      // push root to stack
+      if (root != null)
+        stack.push(root);
+    }
+
+    public boolean hasNext() {
+      return !stack.isEmpty();
+    }
+
+    // pop node from stack and push right child first and then left child
+    public Item next() {
+      Node current = stack.pop();
+      if (current.right != null)
+        stack.push(current.right);
+      if (current.left != null)
+        stack.push(current.left);
+      return current.item;
+    }
+  }
+
+  public Iterator<Item> preOrderIterator() {
+    return new PreOrderIterator();
   }
 
   public static void main(String[] args) {
@@ -185,7 +216,6 @@ public class BinarySearchTree<Item extends Comparable<Item>> {
       bst.add(el);
     }
 
-    // Visualization:
     // 5
     // / \
     // 3 8
@@ -203,16 +233,37 @@ public class BinarySearchTree<Item extends Comparable<Item>> {
     assert bst.height() == 2 : "Height of the tree should be 2";
 
     // Test: InOrderIterator
+    // Test: InOrderIterator
     Iterator<Integer> inOrderIterator = bst.inOrderIterator();
-    int[] inOrderResult = { 1, 3, 4, 5, 7, 8, 9 };
+    int[] inOrderExpectedResult = { 1, 3, 4, 5, 7, 8, 9 };
     int index = 0;
+    StringBuilder inOrderOutput = new StringBuilder("In-order output: ");
     while (inOrderIterator.hasNext()) {
       int currentValue = inOrderIterator.next();
-      System.out.println("Current value from iterator: " + currentValue);
-      assert currentValue == inOrderResult[index++] : "In-order traversal is incorrect at value " + currentValue;
+      inOrderOutput.append(currentValue);
+      if (inOrderIterator.hasNext()) {
+        inOrderOutput.append(", ");
+      }
+      assert currentValue == inOrderExpectedResult[index++]
+          : "In-order traversal is incorrect at value " + currentValue;
     }
+    System.out.println(inOrderOutput.toString());
 
-
+    // Test: PreOrderIterator
+    Iterator<Integer> preOrderIterator = bst.preOrderIterator();
+    int[] preOrderExpectedResult = { 5, 3, 1, 8, 7, 4, 9 };
+    index = 0;
+    StringBuilder preOrderOutput = new StringBuilder("Pre-order output: ");
+    while (preOrderIterator.hasNext()) {
+      int currentValue = preOrderIterator.next();
+      preOrderOutput.append(currentValue);
+      if (preOrderIterator.hasNext()) {
+        preOrderOutput.append(", ");
+      }
+      assert currentValue == preOrderExpectedResult[index++]
+          : "Pre-order traversal is incorrect at value " + currentValue;
+    }
+    System.out.println(preOrderOutput.toString());
 
     System.out.println("All tests passed!");
   }
