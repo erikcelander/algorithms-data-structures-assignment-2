@@ -1,5 +1,7 @@
 package uppgift;
 
+import java.util.Iterator;
+
 public class BinarySearchTree<Item extends Comparable<Item>> {
   private Node root;
 
@@ -22,63 +24,62 @@ public class BinarySearchTree<Item extends Comparable<Item>> {
     return size(root);
   }
 
-  private int size(Node x) {
-    if (x == null) {
+  private int size(Node node) {
+    if (node == null) {
       return 0;
 
     }
-    return x.size;
+    return node.size;
   }
 
-  public Node add(Item item) {
+  public void add(Item item) {
     root = add(root, item);
-    return root;
   }
 
-  private Node add(Node x, Item item) {
-    if (x == null) {
+  private Node add(Node node, Item item) {
+    if (node == null) {
       return new Node(item);
     }
 
     // compare item to x.item
-    int cmp = item.compareTo(x.item);
-    if (cmp < 0) {
+    int compare = item.compareTo(node.item);
+    if (compare < 0) {
       // if item is less than x.item, go left
-      x.left = add(x.left, item);
-    } else if (cmp > 0) {
+      node.left = add(node.left, item);
+    } else if (compare > 0) {
       // if item is greater than x.item, go right
-      x.right = add(x.right, item);
+      node.right = add(node.right, item);
     } else {
       // if item is equal to x.item, update x.item
-      x.item = item;
+      node.item = item;
     }
 
     // update size
-    x.size = 1 + size(x.left) + size(x.right);
+    node.size = 1 + size(node.left) + size(node.right);
 
-    return x;
+    return node;
   }
 
-  public Item contains(Item item) {
-    return contains(root, item);
+  public boolean contains(Item item) {
+    return contains(root, item) != null;
   }
 
-  private Item contains(Node x, Item item) {
-    if (x == null) {
+  private Item contains(Node node, Item item) {
+    if (node == null) {
       return null;
     }
 
     // compare item to x.item
-    int cmp = item.compareTo(x.item);
-    if (cmp < 0) {
+    int compare = item.compareTo(node.item);
+    if (compare < 0) {
       // if item is less than x.item, go left
-      return contains(x.left, item);
-    } else if (cmp > 0) {
+      return contains(node.left, item);
+    } else if (compare > 0) {
       // if item is greater than x.item, go right
-      return contains(x.right, item);
+      return contains(node.right, item);
     } else {
       // if item is equal to x.item, return x.item
-      return x.item;
+      return node.item;
     }
   }
 
@@ -86,40 +87,43 @@ public class BinarySearchTree<Item extends Comparable<Item>> {
     return height(root);
   }
 
-  private int height(Node x) {
-    if (x == null)
+  private int height(Node node) {
+    if (node == null)
       return -1; // base case
 
     // recursive calls
-    return 1 + Math.max(height(x.left), height(x.right));
+    return 1 + Math.max(height(node.left), height(node.right));
   }
 
   public void remove(Item item) {
     root = remove(root, item);
   }
 
-  private Node remove(Node x, Item item) {
-    if (x == null) return null;
+  private Node remove(Node node, Item item) {
+    if (node == null)
+      return null;
 
     // find node to remove
-    int cmp = item.compareTo(x.item);
+    int cmp = item.compareTo(node.item);
     if (cmp < 0)
-      x.left = remove(x.left, item);
+      node.left = remove(node.left, item);
     else if (cmp > 0)
-      x.right = remove(x.right, item);
-    
+      node.right = remove(node.right, item);
+
     else {
-      if (x.right == null) return x.left;
-      if (x.left == null) return x.right;
+      if (node.right == null)
+        return node.left;
+      if (node.left == null)
+        return node.right;
 
       // replace node with minimum node of right sub-tree
-      Node t = x;
-      x = min(t.right);
-      x.right = deleteMin(t.right);
-      x.left = t.left;
+      Node temp = node;
+      node = min(temp.right);
+      node.right = deleteMin(temp.right);
+      node.left = temp.left;
     }
-    x.size = size(x.left) + size(x.right) + 1;
-    return x;
+    node.size = size(node.left) + size(node.right) + 1;
+    return node;
   }
 
   private Node min(Node x) {
@@ -134,6 +138,52 @@ public class BinarySearchTree<Item extends Comparable<Item>> {
     x.left = deleteMin(x.left);
     x.size = size(x.left) + size(x.right) + 1;
     return x;
+  }
+
+
+
+  public static void main(String[] args) {
+    BinarySearchTree<String> bst = new BinarySearchTree<>();
+
+    // Test: isEmpty on an empty BST
+    assert bst.isEmpty() : "BST should be empty initially";
+
+    // Test: size on an empty BST
+    assert bst.size() == 0 : "Size should be 0 initially";
+
+    // Test: add
+    bst.add("A");
+    assert bst.size() == 1 : "Size should be 1 after adding one item";
+    assert !bst.isEmpty() : "BST should not be empty after adding an item";
+
+    // Test: add more items
+    bst.add("B");
+    bst.add("C");
+    assert bst.size() == 3 : "Size should be 3 after adding three items";
+
+    // Test: contains
+    assert bst.contains("A") : "BST should contain 'A'";
+    assert bst.contains("B") : "BST should contain 'B'";
+    assert bst.contains("C") : "BST should contain 'C'";
+    assert !bst.contains("D") : "BST should not contain 'D'";
+
+    // Test: remove
+    bst.remove("A");
+    assert bst.size() == 2 : "Size should be 2 after removing one item";
+    assert !bst.contains("A") : "BST should not contain 'A' after removal";
+
+    // Test: Exception handling for remove
+    try {
+      bst.remove("Z");
+      assert false : "Expected exception when removing a non-existent item";
+    } catch (Exception e) {
+      System.out.println(e.getMessage());
+    }
+
+    // Test: height
+    assert bst.height() == 1 : "Height should be 1";
+
+    System.out.println("All tests passed!");
   }
 
 }
