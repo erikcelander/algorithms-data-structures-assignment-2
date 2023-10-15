@@ -18,5 +18,21 @@ public class RedBlackTree<Item extends Comparable<Item>> {
           this.size = 1;
       }
   }
+
+  public boolean isEmpty() {
+    return size() == 0;
+  }
+
+  public int size() {
+    return size(root);
+  }
+
+  private int size(Node node) {
+    if (node == null) {
+      return 0;
+    }
+
+    return node.size;
+  }
   
 }
