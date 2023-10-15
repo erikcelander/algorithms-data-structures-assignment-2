@@ -5,10 +5,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
 
-public class BinarySearchTree<Item extends Comparable<Item>> {
+public class BinarySearchTree<Item extends Comparable<Item>> implements TreeTraversal<Item> {
   private Node root;
 
-  private class Node {
+  public class Node implements TreeTraversal.Node<Item> {
     private Item item;
     private Node left, right;
     private int size;
@@ -17,6 +17,26 @@ public class BinarySearchTree<Item extends Comparable<Item>> {
       this.item = item;
       this.size = 1;
     }
+
+    @Override
+    public Item getItem() {
+      return item;
+    }
+  }
+
+  @Override
+  public TreeTraversal.Node<Item> getRoot() {
+    return root;
+  }
+
+  @Override
+  public TreeTraversal.Node<Item> getLeftChild(TreeTraversal.Node<Item> node) {
+    return ((Node) node).left;
+  }
+
+  @Override
+  public TreeTraversal.Node<Item> getRightChild(TreeTraversal.Node<Item> node) {
+    return ((Node) node).right;
   }
 
   public boolean isEmpty() {
@@ -165,147 +185,19 @@ public class BinarySearchTree<Item extends Comparable<Item>> {
     root = remove(root, kthLargest);
   }
 
-  public Iterator<Item> inOrderIterator() {
-    return new InOrderIterator();
-  }
+  public InOrderIterator<Item> inOrderIterator() {
+    return new InOrderIterator<>(this);
+}
 
-  private class InOrderIterator implements Iterator<Item> {
-    private Stack<Node> stack = new Stack<>();
-
-    public InOrderIterator() {
-      pushLeft(root);
-    }
-
-    // push all left nodes to stack
-    private void pushLeft(Node node) {
-      while (node != null) {
-        stack.push(node);
-        node = node.left;
-      }
-    }
-
-    // check if stack is not empty
-    public boolean hasNext() {
-      return !stack.isEmpty();
-    }
-
-    // pop node from stack and push all left nodes of right child to stack
-    public Item next() {
-      Node current = stack.pop();
-      pushLeft(current.right);
-      return current.item;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      while (this.hasNext()) {
-        output.append(this.next());
-        if (this.hasNext()) {
-          output.append(", ");
-        }
-      }
-      return output.toString();
-    }
-
-  }
 
   public Iterator<Item> preOrderIterator() {
-    return new PreOrderIterator();
-  }
-
-  private class PreOrderIterator implements Iterator<Item> {
-    private Stack<Node> stack = new Stack<>();
-
-    public PreOrderIterator() {
-      // push root to stack
-      if (root != null)
-        stack.push(root);
-    }
-
-    public boolean hasNext() {
-      return !stack.isEmpty();
-    }
-
-    // pop node from stack and push right child first and then left child
-    public Item next() {
-      Node current = stack.pop();
-      if (current.right != null)
-        stack.push(current.right);
-      if (current.left != null)
-        stack.push(current.left);
-      return current.item;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      while (this.hasNext()) {
-        output.append(this.next());
-        if (this.hasNext()) {
-          output.append(", ");
-        }
-      }
-      return output.toString();
-    }
-
+    return new PreOrderIterator<>(this);
   }
 
   public Iterator<Item> postOrderIterator() {
-    return new PostOrderIterator();
+    return new PostOrderIterator<>(this);
   }
 
-  private class PostOrderIterator implements Iterator<Item> {
-    // use two stacks to implement post-order iteration
-    // stack will contain nodes to be processed
-    private Stack<Node> stack = new Stack<>();
-
-    // output stack will contain the post-order traversal
-    private Stack<Node> output = new Stack<>();
-
-    public PostOrderIterator() {
-      if (root != null) {
-        stack.push(root);
-        while (!stack.isEmpty()) {
-          // pop node from stack and push it to output stack
-          Node current = stack.pop();
-          output.push(current);
-
-          // push left child first and then right child to stack
-          if (current.left != null) {
-            stack.push(current.left);
-          }
-
-          if (current.right != null) {
-            stack.push(current.right);
-          }
-        }
-      }
-    }
-
-    @Override
-    public boolean hasNext() {
-      return !output.isEmpty();
-    }
-
-    @Override
-    public Item next() {
-      return output.pop().item;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      while (this.hasNext()) {
-        output.append(this.next());
-        if (this.hasNext()) {
-          output.append(", ");
-        }
-      }
-      return output.toString();
-    }
-
-  }
 
   public static void main(String[] args) {
     BinarySearchTree<Integer> tree = new BinarySearchTree<>();
@@ -354,6 +246,7 @@ public class BinarySearchTree<Item extends Comparable<Item>> {
 
     // Test: InOrderIterator
     Iterator<Integer> inOrderIterator = tree.inOrderIterator();
+
     int[] inOrderExpectedResult = { 1, 3, 4, 5, 7, 8, 9 };
     for (int currentValue : inOrderExpectedResult) {
       assert inOrderIterator.next() == currentValue

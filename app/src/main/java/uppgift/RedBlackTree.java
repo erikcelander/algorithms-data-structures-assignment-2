@@ -1,12 +1,12 @@
 package uppgift;
 
-public class RedBlackTree<Item extends Comparable<Item>> {
+public class RedBlackTree<Item extends Comparable<Item>> implements TreeTraversal<Item> {
   private static final boolean RED = true;
   private static final boolean BLACK = false;
 
   private Node root;
 
-  private class Node {
+  private class Node implements TreeTraversal.Node<Item> {
     private Item item;
     private Node left, right;
     private boolean color;
@@ -17,6 +17,26 @@ public class RedBlackTree<Item extends Comparable<Item>> {
       this.color = color;
       this.size = 1;
     }
+
+    @Override
+    public Item getItem() {
+      return item;
+    }
+  }
+
+  @Override
+  public TreeTraversal.Node<Item> getRoot() {
+    return root;
+  }
+
+  @Override
+  public TreeTraversal.Node<Item> getLeftChild(TreeTraversal.Node<Item> node) {
+    return ((Node) node).left;
+  }
+
+  @Override
+  public TreeTraversal.Node<Item> getRightChild(TreeTraversal.Node<Item> node) {
+    return ((Node) node).right;
   }
 
   public boolean isEmpty() {
