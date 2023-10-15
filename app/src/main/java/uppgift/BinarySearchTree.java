@@ -1,6 +1,8 @@
 package uppgift;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Stack;
 
 public class BinarySearchTree<Item extends Comparable<Item>> {
@@ -141,6 +143,26 @@ public class BinarySearchTree<Item extends Comparable<Item>> {
     return node;
   }
 
+  public void removeKthLargest(int k) {
+    if (k < 1 || k > size()) {
+      throw new IllegalArgumentException("Invalid value of 'k'");
+    }
+
+    // find the kth largest element
+    List<Item> kLargestElements = new ArrayList<>();
+    Iterator<Item> iterator = inOrderIterator();
+    while (iterator.hasNext()) {
+      kLargestElements.add(iterator.next());
+    }
+    Item kthLargest = kLargestElements.get(kLargestElements.size() - k);
+
+    // remove the kth largest element
+    root = remove(root, kthLargest);
+  }
+
+
+
+
   public Iterator<Item> inOrderIterator() {
     return new InOrderIterator();
   }
@@ -207,7 +229,7 @@ public class BinarySearchTree<Item extends Comparable<Item>> {
 
   private class PostOrderIterator implements Iterator<Item> {
     // use two stacks to implement post-order iteration
-   
+
     // stack will contain nodes to be processed
     private Stack<Node> stack = new Stack<>();
 
@@ -226,7 +248,7 @@ public class BinarySearchTree<Item extends Comparable<Item>> {
           if (current.left != null) {
             stack.push(current.left);
           }
-          // push right child first and then left child to stack
+
           if (current.right != null) {
             stack.push(current.right);
           }
@@ -243,6 +265,10 @@ public class BinarySearchTree<Item extends Comparable<Item>> {
     public Item next() {
       return output.pop().item;
     }
+
+
+    
+  
   }
 
   public static void main(String[] args) {
@@ -260,12 +286,6 @@ public class BinarySearchTree<Item extends Comparable<Item>> {
       bst.add(el);
     }
 
-    //         5
-    //       /   \
-    //      3     8
-    //     / \    / \
-    //    1   4  7   9
-
     assert !bst.isEmpty() : "Tree should not be empty after adding elements";
     assert bst.size() == 7 : "Size should be 7 after adding seven elements";
 
@@ -275,6 +295,27 @@ public class BinarySearchTree<Item extends Comparable<Item>> {
 
     // Test: height
     assert bst.height() == 2 : "Height of the tree should be 2";
+
+    // Print array and tree
+    System.out.println();
+    System.out.print("Array: ");
+    for (int i = 0; i < elements.length; i++) {
+      System.out.print(elements[i]);
+      if (i < elements.length - 1) {
+        System.out.print(", ");
+      }
+    }
+    System.out.println();
+    System.out.println();
+    System.out.println("Tree:");
+
+    System.out.println("        5");
+    System.out.println("      /   \\");
+    System.out.println("     3      8");
+    System.out.println("    / \\    / \\");
+    System.out.println("   1   4  7   9");
+    System.out.println();
+
 
     // Test: InOrderIterator
     Iterator<Integer> inOrderIterator = bst.inOrderIterator();
@@ -310,7 +351,7 @@ public class BinarySearchTree<Item extends Comparable<Item>> {
 
     // Test: PostOrderIterator
     Iterator<Integer> postOrderIterator = bst.postOrderIterator();
-    int[] postOrderExpectedResult = { 1, 4, 3, 7, 9, 8, 5 }; 
+    int[] postOrderExpectedResult = { 1, 4, 3, 7, 9, 8, 5 };
     index = 0;
     StringBuilder postOrderOutput = new StringBuilder("Post-order output: ");
     while (postOrderIterator.hasNext()) {
@@ -324,9 +365,58 @@ public class BinarySearchTree<Item extends Comparable<Item>> {
     }
     System.out.println(postOrderOutput.toString());
 
+    System.out.println();
+    System.out.println();
+    System.out.println("--------------------------------------");
+    System.out.println();
+    System.out.println();
+
+    BinarySearchTree<Integer> bst2 = new BinarySearchTree<>();
+
+    int[] array = { 5, 3, 8, 2, 4, 7, 9, 1, 6, 10 };
+
+    for (int el : array) {
+        bst2.add(el);
+    }
+
+    
+    
+    // Print the array
+    System.out.print("Array: ");
+    for (int i = 0; i < array.length; i++) {
+        System.out.print(array[i]);
+        if (i < array.length - 1) {
+            System.out.print(", ");
+        }
+    }
 
 
+    System.out.println();
+    System.out.println("Tree:");
+    System.out.println("        5");
+    System.out.println("      /   \\");
+    System.out.println("     3     8");
+    System.out.println("    / \\   / \\");
+    System.out.println("   2   4 7   9");
+    System.out.println("  /         / \\");
+    System.out.println(" 1         6   10");
+    
+    // Remove the kth largest value
+    bst2.removeKthLargest(3);
+    
+    System.out.println();
+    System.out.println("Tree after removing 3rd largest value:");
+    System.out.println("        5");
+    System.out.println("      /   \\");
+    System.out.println("     3     7");
+    System.out.println("    / \\     \\");
+    System.out.println("   2   4     9");
+    System.out.println("  /         / \\");
+    System.out.println(" 1         6   10");
+    
+    System.out.println();
+
+ 
     System.out.println("All tests passed!");
   }
-
 }
