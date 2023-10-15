@@ -141,6 +141,10 @@ public class BinarySearchTree<Item extends Comparable<Item>> {
     return node;
   }
 
+  public Iterator<Item> inOrderIterator() {
+    return new InOrderIterator();
+  }
+
   private class InOrderIterator implements Iterator<Item> {
     private Stack<Node> stack = new Stack<>();
 
@@ -169,8 +173,8 @@ public class BinarySearchTree<Item extends Comparable<Item>> {
     }
   }
 
-  public Iterator<Item> inOrderIterator() {
-    return new InOrderIterator();
+  public Iterator<Item> preOrderIterator() {
+    return new PreOrderIterator();
   }
 
   private class PreOrderIterator implements Iterator<Item> {
@@ -197,8 +201,48 @@ public class BinarySearchTree<Item extends Comparable<Item>> {
     }
   }
 
-  public Iterator<Item> preOrderIterator() {
-    return new PreOrderIterator();
+  public Iterator<Item> postOrderIterator() {
+    return new PostOrderIterator();
+  }
+
+  private class PostOrderIterator implements Iterator<Item> {
+    // use two stacks to implement post-order iteration
+   
+    // stack will contain nodes to be processed
+    private Stack<Node> stack = new Stack<>();
+
+    // output stack will contain the post-order traversal
+    private Stack<Node> output = new Stack<>();
+
+    public PostOrderIterator() {
+      if (root != null) {
+        stack.push(root);
+        while (!stack.isEmpty()) {
+          // pop node from stack and push it to output stack
+          Node current = stack.pop();
+          output.push(current);
+
+          // push left child first and then right child to stack
+          if (current.left != null) {
+            stack.push(current.left);
+          }
+          // push right child first and then left child to stack
+          if (current.right != null) {
+            stack.push(current.right);
+          }
+        }
+      }
+    }
+
+    @Override
+    public boolean hasNext() {
+      return !output.isEmpty();
+    }
+
+    @Override
+    public Item next() {
+      return output.pop().item;
+    }
   }
 
   public static void main(String[] args) {
@@ -216,11 +260,11 @@ public class BinarySearchTree<Item extends Comparable<Item>> {
       bst.add(el);
     }
 
-    // 5
-    // / \
-    // 3 8
-    // / \ / \
-    // 1 4 7 9
+    //         5
+    //       /   \
+    //      3     8
+    //     / \    / \
+    //    1   4  7   9
 
     assert !bst.isEmpty() : "Tree should not be empty after adding elements";
     assert bst.size() == 7 : "Size should be 7 after adding seven elements";
@@ -232,7 +276,6 @@ public class BinarySearchTree<Item extends Comparable<Item>> {
     // Test: height
     assert bst.height() == 2 : "Height of the tree should be 2";
 
-    // Test: InOrderIterator
     // Test: InOrderIterator
     Iterator<Integer> inOrderIterator = bst.inOrderIterator();
     int[] inOrderExpectedResult = { 1, 3, 4, 5, 7, 8, 9 };
@@ -264,6 +307,24 @@ public class BinarySearchTree<Item extends Comparable<Item>> {
           : "Pre-order traversal is incorrect at value " + currentValue;
     }
     System.out.println(preOrderOutput.toString());
+
+    // Test: PostOrderIterator
+    Iterator<Integer> postOrderIterator = bst.postOrderIterator();
+    int[] postOrderExpectedResult = { 1, 4, 3, 7, 9, 8, 5 }; 
+    index = 0;
+    StringBuilder postOrderOutput = new StringBuilder("Post-order output: ");
+    while (postOrderIterator.hasNext()) {
+      int currentValue = postOrderIterator.next();
+      postOrderOutput.append(currentValue);
+      if (postOrderIterator.hasNext()) {
+        postOrderOutput.append(", ");
+      }
+      assert currentValue == postOrderExpectedResult[index++]
+          : "Post-order traversal is incorrect at value " + currentValue;
+    }
+    System.out.println(postOrderOutput.toString());
+
+
 
     System.out.println("All tests passed!");
   }
