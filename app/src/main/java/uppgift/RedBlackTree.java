@@ -1,6 +1,9 @@
 package uppgift;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 public class RedBlackTree<Item extends Comparable<Item>> implements TreeTraversal<Item> {
   private static final boolean RED = true;
@@ -124,6 +127,19 @@ public class RedBlackTree<Item extends Comparable<Item>> implements TreeTraversa
     node.right.color = !node.right.color;
   }
 
+  public int height() {
+    return height(root);
+  }
+
+  private int height(Node node) {
+    if (node == null) {
+      return -1;
+    }
+
+    // recursive calls
+    return 1 + Math.max(height(node.left), height(node.right));
+  }
+
   private Node find(Item item) {
     return find(root, item);
   }
@@ -161,22 +177,19 @@ public class RedBlackTree<Item extends Comparable<Item>> implements TreeTraversa
 
   public boolean isRBTreeValid() {
     if (root == null)
-      return true; // An empty tree is valid
+      return true; 
 
-    // Check 1: Root is black
     if (isRed(root)) {
       System.out.println("Root is red");
       return false;
     }
 
-    // Check 2: No red node has a red child
     if (!checkNoRedHasRedChild(root)) {
       System.out.println("Red node with red child found");
       return false;
     }
 
-    // Check 3: Black height is consistent
-    int blackHeight = -1; // Initial value
+    int blackHeight = -1; 
     if (!checkBlackHeight(root, 0, blackHeight)) {
       System.out.println("Black heights inconsistent");
       return false;
@@ -226,58 +239,206 @@ public class RedBlackTree<Item extends Comparable<Item>> implements TreeTraversa
     printInOrderWithColor(node.right);
   }
 
-  public static void main(String[] args) {
-    RedBlackTree<Integer> tree = new RedBlackTree<>();
-    assert tree.isEmpty() : "Tree should be empty initially";
-    assert tree.size() == 0 : "Size should be 0 initially";
-    int[] nodes = { 50, 30, 70, 20, 40, 60, 80, 10, 35, 55, 75, 90 };
-    for (int node : nodes) {
-      tree.add(node);
+  public void delete(Item item) {
+    if (contains(item)) {
+      root = delete(root, item);
+      if (root != null)
+        root.color = BLACK;
     }
-
-    System.out.println("In-order traversal with colors:");
-    tree.printInOrderWithColor();
-
-    if (tree.isRBTreeValid()) {
-      System.out.println("Tree is a valid Red-Black Tree!");
-    } else {
-      System.out.println("Tree is not a valid Red-Black Tree!");
-    }
-
-    RedBlackTree<Integer> tree2 = new RedBlackTree<>();
-    assert tree2.isEmpty() : "Tree should be empty initially";
-    assert tree2.size() == 0 : "Size should be 0 initially";
-    int[] nodes2 = { 100, 90, 80, 70, 60, 50, 40, 30, 20, 10 };
-    for (int node : nodes2) {
-      tree2.add(node);
-    }
-
-    System.out.println("In-order traversal with colors:");
-    tree2.printInOrderWithColor();
-
-    if (tree2.isRBTreeValid()) {
-      System.out.println("Tree is a valid Red-Black Tree!");
-    } else {
-      System.out.println("Tree is not a valid Red-Black Tree!");
-    }
-
-    RedBlackTree<Integer> tree3 = new RedBlackTree<>();
-    assert tree3.isEmpty() : "Tree should be empty initially";
-    assert tree3.size() == 0 : "Size should be 0 initially";
-    int[] nodes3 = { 50, 30, 70, 10, 40, 60, 80, 20, 90, 35, 55, 75 };
-    for (int node : nodes3) {
-      tree3.add(node);
-    }
-
-    System.out.println("In-order traversal with colors (Mixed Order Sequence):");
-    tree3.printInOrderWithColor();
-
-    if (tree3.isRBTreeValid()) {
-      System.out.println("Tree is a valid Red-Black Tree!");
-    } else {
-      System.out.println("Tree is not a valid Red-Black Tree!");
-    }
-
   }
 
+  private Node delete(Node node, Item item) {
+    if (item.compareTo(node.item) < 0) {
+      if (!isRed(node.left) && !isRed(node.left.left)) {
+        node = moveRedLeft(node);
+      }
+      node.left = delete(node.left, item);
+    } else {
+      if (isRed(node.left)) {
+        node = rotateRight(node);
+      }
+      if (item.compareTo(node.item) == 0 && (node.right == null)) {
+        return null;
+      }
+      if (!isRed(node.right) && !isRed(node.right.left)) {
+        node = moveRedRight(node);
+      }
+      if (item.compareTo(node.item) == 0) {
+        Node min = getMin(node.right);
+        node.item = min.item;
+        node.right = deleteMin(node.right);
+      } else {
+        node.right = delete(node.right, item);
+      }
+    }
+    return balance(node);
+  }
+
+  private Node moveRedLeft(Node node) {
+    flipColors(node);
+    if (isRed(node.right.left)) {
+      node.right = rotateRight(node.right);
+      node = rotateLeft(node);
+      flipColors(node);
+    }
+    return node;
+  }
+
+  private Node moveRedRight(Node node) {
+    flipColors(node);
+    if (isRed(node.left.left)) {
+      node = rotateRight(node);
+      flipColors(node);
+    }
+    return node;
+  }
+
+  private Node deleteMin(Node node) {
+    if (node.left == null)
+      return null;
+
+    if (!isRed(node.left) && !isRed(node.left.left))
+      node = moveRedLeft(node);
+
+    node.left = deleteMin(node.left);
+
+    return balance(node);
+  }
+
+  private Node getMin(Node node) {
+    while (node.left != null) {
+      node = node.left;
+    }
+    return node;
+  }
+
+  private Node balance(Node node) {
+    if (isRed(node.right)) {
+      node = rotateLeft(node);
+    }
+    if (isRed(node.left) && isRed(node.left.left)) {
+      node = rotateRight(node);
+    }
+    if (isRed(node.left) && isRed(node.right)) {
+      flipColors(node);
+    }
+
+    node.size = size(node.left) + size(node.right) + 1;
+    return node;
+  }
+
+
+  public static void main(String[] args) {
+    RedBlackTree<Integer> tree = new RedBlackTree<>();
+    List<Integer> numbers = new ArrayList<>();
+
+    // Insert 100 numbers
+    for (int i = 0; i < 100; i++) {
+        numbers.add(i);
+    }
+    Collections.shuffle(numbers);
+    for (int num : numbers) {
+        tree.add(num);
+    }
+
+    // Delete 50 of them
+    Collections.shuffle(numbers);
+    for (int i = 0; i < 50; i++) {
+        tree.delete(numbers.get(i));
+    }
+
+    // Re-insert 25 numbers
+    for (int i = 0; i < 25; i++) {
+        tree.add(numbers.get(i));
+    }
+
+    // Measure time for some operations and print tree height
+    long start = System.nanoTime();
+    tree.add(150);
+    long duration = System.nanoTime() - start;
+    System.out.println("Insertion time: " + duration + " nanoseconds");
+
+    start = System.nanoTime();
+    tree.delete(50);
+    duration = System.nanoTime() - start;
+    System.out.println("Deletion time: " + duration + " nanoseconds");
+
+    System.out.println("Height of tree: " + tree.height());
+
+    if (tree.isRBTreeValid()) {
+        System.out.println("Tree is a valid Red-Black Tree!");
+    } else {
+        System.out.println("Tree is not a valid Red-Black Tree!");
+    }
+}
+
+
+  // public static void main(String[] args) {
+  //   RedBlackTree<Integer> tree = new RedBlackTree<>();
+  //   assert tree.isEmpty() : "Tree should be empty initially";
+  //   assert tree.size() == 0 : "Size should be 0 initially";
+  //   int[] nodes = { 50, 30, 70, 20, 40, 60, 80, 10, 35, 55, 75, 90 };
+  //   for (int node : nodes) {
+  //     tree.add(node);
+  //   }
+
+  //   System.out.println("In-order traversal with colors:");
+  //   tree.printInOrderWithColor();
+  //   System.out.println("Deleting 20 and 90...");
+  //   tree.delete(20);
+  //   tree.delete(90);
+  //   System.out.println("After deletion:");
+  //   tree.printInOrderWithColor();
+
+  //   if (tree.isRBTreeValid()) {
+  //     System.out.println("Tree is a valid Red-Black Tree!");
+  //   } else {
+  //     System.out.println("Tree is not a valid Red-Black Tree!");
+  //   }
+
+  //   RedBlackTree<Integer> tree2 = new RedBlackTree<>();
+  //   assert tree2.isEmpty() : "Tree should be empty initially";
+  //   assert tree2.size() == 0 : "Size should be 0 initially";
+  //   int[] nodes2 = { 100, 90, 80, 70, 60, 50, 40, 30, 20, 10 };
+  //   for (int node : nodes2) {
+  //     tree2.add(node);
+  //   }
+
+  //   System.out.println("\nIn-order traversal with colors:");
+  //   tree2.printInOrderWithColor();
+  //   System.out.println("Deleting 100 and 60...");
+  //   tree2.delete(100);
+  //   tree2.delete(60);
+  //   System.out.println("After deletion:");
+  //   tree2.printInOrderWithColor();
+
+  //   if (tree2.isRBTreeValid()) {
+  //     System.out.println("Tree is a valid Red-Black Tree!");
+  //   } else {
+  //     System.out.println("Tree is not a valid Red-Black Tree!");
+  //   }
+
+  //   RedBlackTree<Integer> tree3 = new RedBlackTree<>();
+  //   assert tree3.isEmpty() : "Tree should be empty initially";
+  //   assert tree3.size() == 0 : "Size should be 0 initially";
+  //   int[] nodes3 = { 50, 30, 70, 10, 40, 60, 80, 20, 90, 35, 55, 75 };
+  //   for (int node : nodes3) {
+  //     tree3.add(node);
+  //   }
+
+  //   System.out.println("\nIn-order traversal with colors (Mixed Order Sequence):");
+  //   tree3.printInOrderWithColor();
+  //   System.out.println("Deleting 50 and 10...");
+  //   tree3.delete(50);
+  //   tree3.delete(10);
+  //   System.out.println("After deletion:");
+  //   tree3.printInOrderWithColor();
+
+  //   if (tree3.isRBTreeValid()) {
+
+  //     System.out.println("Tree is a valid Red-Black Tree!");
+  //   } else {
+  //     System.out.println("Tree is not a valid Red-Black Tree!");
+  //   }
+  // }
 }
