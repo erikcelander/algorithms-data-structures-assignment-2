@@ -1,5 +1,7 @@
 package uppgift;
 
+import java.util.Iterator;
+
 public class RedBlackTree<Item extends Comparable<Item>> implements TreeTraversal<Item> {
   private static final boolean RED = true;
   private static final boolean BLACK = false;
@@ -51,7 +53,6 @@ public class RedBlackTree<Item extends Comparable<Item>> implements TreeTraversa
     if (node == null) {
       return 0;
     }
-
     return node.size;
   }
 
@@ -59,96 +60,55 @@ public class RedBlackTree<Item extends Comparable<Item>> implements TreeTraversa
     if (node == null) {
       return false;
     }
-
     return node.color == RED;
   }
 
   public void add(Item item) {
     root = add(root, item);
-    // root.color = BLACK;
+    root.color = BLACK;
   }
 
   private Node add(Node node, Item item) {
     if (node == null) {
-      System.out.println("Adding new node with value: " + item);
       return new Node(item, RED);
     }
 
     int compare = item.compareTo(node.item);
     if (compare < 0) {
-      System.out.println("Going left from node with value: " + node.item);
       node.left = add(node.left, item);
     } else if (compare > 0) {
-      System.out.println("Going right from node with value: " + node.item);
       node.right = add(node.right, item);
     } else {
-      System.out.println("Replacing node with value: " + node.item);
       node.item = item;
     }
 
-    // Convert right-leaning red link to left-leaning red link
     if (isRed(node.right) && !isRed(node.left)) {
-      System.out.println("Converting right-leaning red link to left-leaning red link at node with value: " + node.item);
       node = rotateLeft(node);
-      // Check for two red children after rotation
-      if (isRed(node.left) && isRed(node.right)) {
-        System.out.println("Finding node with two red children and flipping colors at node with value: " + node.item);
-        flipColors(node);
-      }
     }
-
-    // Find node with red left child and red left grandchild and rotate right
     if (isRed(node.left) && isRed(node.left.left)) {
-      System.out
-          .println("Finding node with red left child and red left grandchild and rotating right at node with value: "
-              + node.item);
       node = rotateRight(node);
-      // Check for two red children after rotation
-      if (isRed(node.left) && isRed(node.right)) {
-        System.out.println("Finding node with two red children and flipping colors at node with value: " + node.item);
-        flipColors(node);
-      }
+    }
+    if (isRed(node.left) && isRed(node.right)) {
+      flipColors(node);
     }
 
     node.size = size(node.left) + size(node.right) + 1;
-
-    // Enforce that root is always black
-    if (node == root) {
-      System.out.println("Setting root node with value: " + node.item + " to BLACK");
-      node.color = BLACK;
-    }
-
-    System.out.println("End of add method for node with value: " + node.item);
     return node;
   }
 
-  // enforce that red links lean left by rotating left
   private Node rotateLeft(Node node) {
-
-    // assign right node to temp
     Node temp = node.right;
-
-    // assign left node of temp to right node of node
     node.right = temp.left;
-    // assign node to left node of temp
     temp.left = node;
-    // assign color of temp to color of node
     temp.color = node.color;
-    // assign color of node to red
     node.color = RED;
-    // assign size of temp to size of node
     temp.size = node.size;
-    // assign size of node to size of left node + size of right node + 1
     node.size = size(node.left) + size(node.right) + 1;
-
     return temp;
   }
 
   private Node rotateRight(Node node) {
-
-    // enforce that red links lean left by rotating right
     Node temp = node.left;
-    // assign right node of temp to left node of node
     node.left = temp.right;
     temp.right = node;
     temp.color = node.color;
@@ -158,110 +118,166 @@ public class RedBlackTree<Item extends Comparable<Item>> implements TreeTraversa
     return temp;
   }
 
-  // flip the colors of a node and its two red children nodes
   private void flipColors(Node node) {
-    node.color = RED;
-    node.left.color = BLACK;
-    node.right.color = BLACK;
+    node.color = !node.color;
+    node.left.color = !node.left.color;
+    node.right.color = !node.right.color;
   }
 
-  public void printInOrder(Node node) {
+  private Node find(Item item) {
+    return find(root, item);
+  }
+
+  private Node find(Node node, Item item) {
     if (node == null) {
-      return;
+      return null;
     }
 
-    printInOrder(node.left);
-    System.out.println(node.item + " (" + (node.color == RED ? "RED" : "BLACK") + ")");
-    printInOrder(node.right);
+    int compare = item.compareTo(node.item);
+    if (compare < 0) {
+      return find(node.left, item);
+    } else if (compare > 0) {
+      return find(node.right, item);
+    } else {
+      return node;
+    }
   }
 
-  public boolean hasConsecutiveRedLinks(Node node) {
-    if (node == null) {
+  public boolean contains(Item item) {
+    return find(item) != null;
+  }
+
+  public InOrderIterator<Item> inOrderIterator() {
+    return new InOrderIterator<>(this);
+  }
+
+  public Iterator<Item> preOrderIterator() {
+    return new PreOrderIterator<>(this);
+  }
+
+  public Iterator<Item> postOrderIterator() {
+    return new PostOrderIterator<>(this);
+  }
+
+  public boolean isRBTreeValid() {
+    if (root == null)
+      return true; // An empty tree is valid
+
+    // Check 1: Root is black
+    if (isRed(root)) {
+      System.out.println("Root is red");
       return false;
     }
 
-    if (isRed(node) && (isRed(node.left) || isRed(node.right))) {
-      return true;
+    // Check 2: No red node has a red child
+    if (!checkNoRedHasRedChild(root)) {
+      System.out.println("Red node with red child found");
+      return false;
     }
 
-    return hasConsecutiveRedLinks(node.left) || hasConsecutiveRedLinks(node.right);
+    // Check 3: Black height is consistent
+    int blackHeight = -1; // Initial value
+    if (!checkBlackHeight(root, 0, blackHeight)) {
+      System.out.println("Black heights inconsistent");
+      return false;
+    }
+
+    return true;
+  }
+
+  private boolean checkNoRedHasRedChild(Node node) {
+    if (node == null)
+      return true;
+
+    if (isRed(node)) {
+      if (isRed(node.left) || isRed(node.right)) {
+        return false;
+      }
+    }
+
+    return checkNoRedHasRedChild(node.left) && checkNoRedHasRedChild(node.right);
+  }
+
+  private boolean checkBlackHeight(Node node, int currentHeight, int blackHeight) {
+    if (node == null) {
+      if (blackHeight == -1) {
+        blackHeight = currentHeight;
+      }
+      return currentHeight == blackHeight;
+    }
+
+    if (!isRed(node))
+      currentHeight++;
+
+    return checkBlackHeight(node.left, currentHeight, blackHeight)
+        && checkBlackHeight(node.right, currentHeight, blackHeight);
+  }
+
+  public void printInOrderWithColor() {
+    printInOrderWithColor(root);
+  }
+
+  private void printInOrderWithColor(Node node) {
+    if (node == null)
+      return;
+
+    printInOrderWithColor(node.left);
+    System.out.println(node.item + " (" + (node.color == RED ? "RED" : "BLACK") + ")");
+    printInOrderWithColor(node.right);
   }
 
   public static void main(String[] args) {
-    RedBlackTree<Integer> rbt = new RedBlackTree<>();
-
-    // Test: isEmpty on an empty tree
-    assert rbt.isEmpty() : "Tree should be empty initially";
-
-    // Test: size on an empty tree
-    assert rbt.size() == 0 : "Size should be 0 initially";
-
-    // Add elements to the tree in a specific order to ensure a red node
-    rbt.add(10); // This should cause a rotation
-    rbt.add(20); // This should be red
-    rbt.add(30); // This will be the root and should be black
-
-    // Print tree using in-order traversal
-    System.out.println("In-order traversal of insert order of 10 then 20 then 30:");
-    rbt.printInOrder(rbt.root);
-    System.out.println();
-
-    // Basic assertions to validate properties of Red-Black Tree
-    assert !rbt.isRed(rbt.root) : "Root should always be black";
-    assert rbt.isRed(rbt.root.left) : "Left child of root should be red";
-    assert rbt.isRed(rbt.root.right) : "Right child of root should be red";
-    System.out.println();
-    System.out.println();
-
-    RedBlackTree<Integer> rbt2 = new RedBlackTree<>();
-
-    // Test: isEmpty on an empty tree
-    assert rbt2.isEmpty() : "Tree should be empty initially";
-
-    // Test: size on an empty tree
-    assert rbt2.size() == 0 : "Size should be 0 initially";
-
-    // Add elements to the tree in a specific order to ensure a red node
-    rbt2.add(10); // This should cause a rotation
-    // This should be red
-    rbt2.add(30); // This will be the root and should be black
-    rbt2.add(20);
-
-    // Print tree using in-order traversal
-    System.out.println("In-order traversal of insert order 10 then 30 then 20:");
-    rbt2.printInOrder(rbt2.root);
-    System.out.println();
-
-    // Basic assertions to validate properties of Red-Black Tree
-    assert !rbt2.isRed(rbt2.root) : "Root should always be black";
-    assert rbt2.isRed(rbt2.root.left) : "Left child of root should be red";
-    assert rbt2.isRed(rbt2.root.right) : "Right child of root should be red";
-    System.out.println();
-    System.out.println();
-
-    RedBlackTree<Integer> rbt3 = new RedBlackTree<>();
-
-    // Test: isEmpty on an empty tree
-    assert rbt3.isEmpty() : "Tree should be empty initially";
-
-    // Test: size on an empty tree
-    assert rbt3.size() == 0 : "Size should be 0 initially";
-
-    // Add elements to the tree in the specified order
+    RedBlackTree<Integer> tree = new RedBlackTree<>();
+    assert tree.isEmpty() : "Tree should be empty initially";
+    assert tree.size() == 0 : "Size should be 0 initially";
     int[] nodes = { 50, 30, 70, 20, 40, 60, 80, 10, 35, 55, 75, 90 };
     for (int node : nodes) {
-      rbt3.add(node);
+      tree.add(node);
     }
 
-    // Print tree using in-order traversal
-    System.out.println("In-order traversal for the larger dataset:");
-    rbt3.printInOrder(rbt3.root);
-    System.out.println();
+    System.out.println("In-order traversal with colors:");
+    tree.printInOrderWithColor();
 
-    // Basic assertions to validate properties of Red-Black Tree
-    assert !rbt3.isRed(rbt3.root) : "Root should always be black";
+    if (tree.isRBTreeValid()) {
+      System.out.println("Tree is a valid Red-Black Tree!");
+    } else {
+      System.out.println("Tree is not a valid Red-Black Tree!");
+    }
 
-    System.out.println("All tests passed!");
+    RedBlackTree<Integer> tree2 = new RedBlackTree<>();
+    assert tree2.isEmpty() : "Tree should be empty initially";
+    assert tree2.size() == 0 : "Size should be 0 initially";
+    int[] nodes2 = { 100, 90, 80, 70, 60, 50, 40, 30, 20, 10 };
+    for (int node : nodes2) {
+      tree2.add(node);
+    }
+
+    System.out.println("In-order traversal with colors:");
+    tree2.printInOrderWithColor();
+
+    if (tree2.isRBTreeValid()) {
+      System.out.println("Tree is a valid Red-Black Tree!");
+    } else {
+      System.out.println("Tree is not a valid Red-Black Tree!");
+    }
+
+    RedBlackTree<Integer> tree3 = new RedBlackTree<>();
+    assert tree3.isEmpty() : "Tree should be empty initially";
+    assert tree3.size() == 0 : "Size should be 0 initially";
+    int[] nodes3 = { 50, 30, 70, 10, 40, 60, 80, 20, 90, 35, 55, 75 };
+    for (int node : nodes3) {
+      tree3.add(node);
+    }
+
+    System.out.println("In-order traversal with colors (Mixed Order Sequence):");
+    tree3.printInOrderWithColor();
+
+    if (tree3.isRBTreeValid()) {
+      System.out.println("Tree is a valid Red-Black Tree!");
+    } else {
+      System.out.println("Tree is not a valid Red-Black Tree!");
+    }
+
   }
 
 }
