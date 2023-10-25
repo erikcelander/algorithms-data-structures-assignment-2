@@ -332,7 +332,6 @@ public class RedBlackTree<Item extends Comparable<Item>> implements TreeTraversa
     RedBlackTree<Integer> tree = new RedBlackTree<>();
     List<Integer> numbers = new ArrayList<>();
 
-    // Insert 100 numbers
     for (int i = 0; i < 100; i++) {
         numbers.add(i);
     }
@@ -341,18 +340,15 @@ public class RedBlackTree<Item extends Comparable<Item>> implements TreeTraversa
         tree.add(num);
     }
 
-    // Delete 50 of them
     Collections.shuffle(numbers);
     for (int i = 0; i < 50; i++) {
         tree.delete(numbers.get(i));
     }
 
-    // Re-insert 25 numbers
     for (int i = 0; i < 25; i++) {
         tree.add(numbers.get(i));
     }
 
-    // Measure time for some operations and print tree height
     long start = System.nanoTime();
     tree.add(150);
     long duration = System.nanoTime() - start;
