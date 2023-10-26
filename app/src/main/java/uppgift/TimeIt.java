@@ -61,24 +61,4 @@ public class TimeIt {
 
     return new TimingResult(min, median, avg, max, stdDev, repetitions);
   }
-
-  public static void main(String[] args) {
-
-    // Example lambda to test the functionality
-    Callable<Void> code = () -> {
-      int sum = 0;
-      for (int i = 0; i < 100; i++) {
-        sum += i;
-      }
-      return null;
-    };
-
-    try {
-      TimingResult res = timeIt(code, 10000);
-      System.out.println(res.toString());
-
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-  }
 }

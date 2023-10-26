@@ -179,3 +179,116 @@ public class BenchmarkTrees {
         return values;
     }
 }
+
+
+// Size: 200, Data Type: Skewed
+// -------------------------------------------------
+// BST Insertion Average Time: 0.000039 ms, Average Height: 199
+// RBT Insertion Average Time: 0.000003 ms, Average Height: 7
+// -------------------------------------------------
+// BST Search Average Time: 0.000068 ms
+// RBT Search Average Time: 0.000003 ms
+// -------------------------------------------------
+// BST Deletion Average Time: 0.000039 ms
+// RBT Deletion Average Time: 0.000006 ms
+// -------------------------------------------------
+// Size: 200, Data Type: Non-Skewed
+// -------------------------------------------------
+// BST Insertion Average Time: 0.000002 ms, Average Height: 13
+// RBT Insertion Average Time: 0.000004 ms, Average Height: 10
+// -------------------------------------------------
+// BST Search Average Time: 0.000004 ms
+// RBT Search Average Time: 0.000004 ms
+// -------------------------------------------------
+// BST Deletion Average Time: 0.000003 ms
+// RBT Deletion Average Time: 0.000006 ms
+// -------------------------------------------------
+// Size: 400, Data Type: Skewed
+// -------------------------------------------------
+// BST Insertion Average Time: 0.000175 ms, Average Height: 399
+// RBT Insertion Average Time: 0.000006 ms, Average Height: 8
+// -------------------------------------------------
+// BST Search Average Time: 0.000303 ms
+// RBT Search Average Time: 0.000009 ms
+// -------------------------------------------------
+// BST Deletion Average Time: 0.000174 ms
+// RBT Deletion Average Time: 0.000015 ms
+// -------------------------------------------------
+// Size: 400, Data Type: Non-Skewed
+// -------------------------------------------------
+// BST Insertion Average Time: 0.000006 ms, Average Height: 16
+// RBT Insertion Average Time: 0.000007 ms, Average Height: 11
+// -------------------------------------------------
+// BST Search Average Time: 0.000008 ms
+// RBT Search Average Time: 0.000009 ms
+// -------------------------------------------------
+// BST Deletion Average Time: 0.000008 ms
+// RBT Deletion Average Time: 0.000014 ms
+// -------------------------------------------------
+// Size: 800, Data Type: Skewed
+// -------------------------------------------------
+// BST Insertion Average Time: 0.000732 ms, Average Height: 799
+// RBT Insertion Average Time: 0.000016 ms, Average Height: 9
+// -------------------------------------------------
+// BST Search Average Time: 0.001272 ms
+// RBT Search Average Time: 0.000022 ms
+// -------------------------------------------------
+// BST Deletion Average Time: 0.000733 ms
+// RBT Deletion Average Time: 0.000040 ms
+// -------------------------------------------------
+// Size: 800, Data Type: Non-Skewed
+// -------------------------------------------------
+// BST Insertion Average Time: 0.000020 ms, Average Height: 19
+// RBT Insertion Average Time: 0.000016 ms, Average Height: 12
+// -------------------------------------------------
+// BST Search Average Time: 0.000027 ms
+// RBT Search Average Time: 0.000025 ms
+// -------------------------------------------------
+// BST Deletion Average Time: 0.000025 ms
+// RBT Deletion Average Time: 0.000042 ms
+// -------------------------------------------------
+// Size: 1600, Data Type: Skewed
+// -------------------------------------------------
+// BST Insertion Average Time: 0.003244 ms, Average Height: 1599
+// RBT Insertion Average Time: 0.000043 ms, Average Height: 10
+// -------------------------------------------------
+// BST Search Average Time: 0.005668 ms
+// RBT Search Average Time: 0.000062 ms
+// -------------------------------------------------
+// BST Deletion Average Time: 0.003241 ms
+// RBT Deletion Average Time: 0.000101 ms
+// -------------------------------------------------
+// Size: 1600, Data Type: Non-Skewed
+// -------------------------------------------------
+// BST Insertion Average Time: 0.000045 ms, Average Height: 22
+// RBT Insertion Average Time: 0.000049 ms, Average Height: 14
+// -------------------------------------------------
+// BST Search Average Time: 0.000075 ms
+// RBT Search Average Time: 0.000083 ms
+// -------------------------------------------------
+// BST Deletion Average Time: 0.000062 ms
+// RBT Deletion Average Time: 0.000118 ms
+// -------------------------------------------------
+// Size: 3200, Data Type: Skewed
+// -------------------------------------------------
+// BST Insertion Average Time: 0.013692 ms, Average Height: 3199
+// RBT Insertion Average Time: 0.000102 ms, Average Height: 11
+// -------------------------------------------------
+// BST Search Average Time: 0.024032 ms
+// RBT Search Average Time: 0.000152 ms
+// -------------------------------------------------
+// BST Deletion Average Time: 0.013687 ms
+// RBT Deletion Average Time: 0.000230 ms
+// -------------------------------------------------
+// Size: 3200, Data Type: Non-Skewed
+// -------------------------------------------------
+// BST Insertion Average Time: 0.000111 ms, Average Height: 24
+// RBT Insertion Average Time: 0.000132 ms, Average Height: 14
+// -------------------------------------------------
+// BST Search Average Time: 0.000189 ms
+// RBT Search Average Time: 0.000215 ms
+// -------------------------------------------------
+// BST Deletion Average Time: 0.000155 ms
+// RBT Deletion Average Time: 0.000289 ms
+// -------------------------------------------------
+// Done
