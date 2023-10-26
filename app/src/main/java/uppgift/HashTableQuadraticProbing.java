@@ -24,13 +24,16 @@ public class HashTableQuadraticProbing<T> {
 
   public void insert(T element) {
     int currentPos = findPos(element);
-    if (isActive(currentPos)) {
-      hashTable[currentPos].element = element;
-      return;
-    }
 
-    hashTable[currentPos] = new HashEntry<>(element, true);
-    size++;
+    // if element is already present but not active, reactivate it
+    if (hashTable[currentPos] != null && !hashTable[currentPos].isActive) {
+      hashTable[currentPos].isActive = true;
+      size++;
+
+    } else if (hashTable[currentPos] == null) {
+      hashTable[currentPos] = new HashEntry<>(element, true);
+      size++;
+    }
 
     if (size > capacity / 2) {
       resize();
@@ -52,9 +55,8 @@ public class HashTableQuadraticProbing<T> {
 
   @SuppressWarnings("unchecked")
   private void resize() {
-    capacity = capacity * 2;
-
     HashEntry<T>[] oldHashTable = hashTable;
+    capacity = capacity * 2;
     hashTable = (HashEntry<T>[]) new HashEntry[capacity];
     size = 0;
 
@@ -70,11 +72,8 @@ public class HashTableQuadraticProbing<T> {
     int currentPos = element.hashCode() % capacity;
 
     while (hashTable[currentPos] != null && !hashTable[currentPos].element.equals(element)) {
-      currentPos += offset;
+      currentPos = (currentPos + offset) % capacity; 
       offset += 2;
-      if (currentPos >= capacity) {
-        currentPos -= capacity;
-      }
     }
 
     return currentPos;
@@ -92,7 +91,6 @@ public class HashTableQuadraticProbing<T> {
     return capacity;
   }
 
- 
   public static void main(String[] args) {
     HashTableQuadraticProbing<Integer> hashTable = new HashTableQuadraticProbing<>(10);
 
@@ -107,30 +105,35 @@ public class HashTableQuadraticProbing<T> {
     System.out.println("search 4: Expected false, got " + hashTable.search(4));
 
     // Test removing values
+     int expectedSize = hashTable.size() - 1;
     hashTable.remove(2);
     System.out.println("After removing 2: Expected false, got " + hashTable.search(2));
-    System.out.println("Size after removing 2: Expected 2, got " + hashTable.size());
+     System.out.println("Size after removing 20: Expected " + expectedSize + ", got " + hashTable.size());
+
 
     // Test inserting more values to check for collisions and resizing
     for (int i = 4; i <= 20; i++) {
-        hashTable.insert(i);
+      hashTable.insert(i);
     }
-    System.out.println("After inserting values 4 to 20: Size = " + hashTable.size() + ", Capacity = " + hashTable.capacity());
+    System.out
+        .println("After inserting values 4 to 20: Size = " + hashTable.size() + ", Capacity = " + hashTable.capacity());
 
     // Test if specific values are present after resizing
     System.out.println("search 10: Expected true, got " + hashTable.search(10));
     System.out.println("search 15: Expected true, got " + hashTable.search(15));
     System.out.println("search 21: Expected false, got " + hashTable.search(21));
 
+    System.out.println("Size before removing 10: " + hashTable.size());
     // Test removing a value and checking size
+    int sizeBeforeRemove = hashTable.size();
+    expectedSize = hashTable.size() - 1;
     hashTable.remove(10);
     System.out.println("After removing 10: Expected false, got " + hashTable.search(10));
-    System.out.println("Size after removing 10: Expected " + (hashTable.size() - 1) + ", got " + hashTable.size());
+    System.out.println("Size after removing 10: Expected " + expectedSize + ", got " + hashTable.size());
 
     // Test inserting a value that was previously removed
     hashTable.insert(10);
     System.out.println("After re-inserting 10: Expected true, got " + hashTable.search(10));
-    System.out.println("Size after re-inserting 10: Expected " + (hashTable.size() + 1) + ", got " + hashTable.size());
-}
-
+    System.out.println("Size after re-inserting 10: Expected "+ sizeBeforeRemove + ", got " + hashTable.size());
+  }
 }
