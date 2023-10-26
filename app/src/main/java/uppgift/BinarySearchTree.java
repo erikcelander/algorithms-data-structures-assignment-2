@@ -3,7 +3,6 @@ package uppgift;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Stack;
 
 public class BinarySearchTree<Item extends Comparable<Item>> implements TreeTraversal<Item> {
   private Node root;
