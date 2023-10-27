@@ -16,6 +16,7 @@ public class HashTableQuadraticProbing<T> {
   private int size;
   private int initialConflicts;
   private int probingConflicts;
+  private int resizes;
 
   @SuppressWarnings("unchecked")
   public HashTableQuadraticProbing(int capacity) {
@@ -24,6 +25,7 @@ public class HashTableQuadraticProbing<T> {
     this.initialConflicts = 0;
     this.probingConflicts = 0;
     this.size = 0;
+    this.resizes = 0;
   }
 
   public void insert(T element) {
@@ -32,13 +34,18 @@ public class HashTableQuadraticProbing<T> {
     if (hashTable[currentPos] == null || !hashTable[currentPos].isActive) {
       hashTable[currentPos] = new HashEntry<>(element, true);
       size++;
-      if (size > capacity / 2) {
-        resize();
-      }
+
     } else {
       hashTable[currentPos].element = element;
     }
+    if (resizes == 0) {
+      if (getLoadFactor() > 0.25)
+        resize();
 
+    } else {
+      if (getLoadFactor() > 0.5)
+        resize();
+    }
   }
 
   public T search(T element) {
@@ -69,7 +76,8 @@ public class HashTableQuadraticProbing<T> {
       initialConflicts++;
     }
 
-    while (hashTable[currentPos] != null&& (!hashTable[currentPos].isActive || !hashTable[currentPos].element.equals(element))) {
+    while (hashTable[currentPos] != null
+        && (!hashTable[currentPos].isActive || !hashTable[currentPos].element.equals(element))) {
       probeNumber++;
       if (probeNumber > 1) {
         probingConflicts++;
@@ -86,7 +94,7 @@ public class HashTableQuadraticProbing<T> {
   }
 
   private int adaptedHash(T element) {
-    int hashVal = (31 * element.hashCode());
+    int hashVal = Math.abs(element.hashCode());
     hashVal %= capacity;
 
     while (hashVal < 0) {
@@ -119,6 +127,8 @@ public class HashTableQuadraticProbing<T> {
         insert(entry.element);
       }
     }
+
+    resizes++;
   }
 
   public int size() {
@@ -140,4 +150,9 @@ public class HashTableQuadraticProbing<T> {
   public int getProbingConflicts() {
     return probingConflicts;
   }
+
+  private double getLoadFactor() {
+    return (double) size / capacity;
+  }
+
 }
