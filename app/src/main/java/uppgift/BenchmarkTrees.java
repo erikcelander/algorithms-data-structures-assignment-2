@@ -116,7 +116,7 @@ public class BenchmarkTrees {
                 TimeIt.TimingResult rbtDeleteResult = TimeIt.timeIt(rbtDeleteCode, repetitions);
                 totalRBTDeletionTime += rbtDeleteResult.avg;
 
-                // Summing results
+
                 if (skewed) {
                     totalBSTInsertionTimeSkewed += totalBSTInsertionTime / repetitions;
                     totalRBTInsertionTimeSkewed += totalRBTInsertionTime / repetitions;
@@ -138,7 +138,6 @@ public class BenchmarkTrees {
                 }
             }
 
-            // Calculate and print averages after all iterations for a given size
             int halfIterations = iterations / 2;
             printAverages(size, "Skewed", totalBSTInsertionTimeSkewed, totalRBTInsertionTimeSkewed, totalBSTHeightSkewed, totalRBTHeightSkewed, totalBSTSearchTimeSkewed, totalRBTSearchTimeSkewed, totalBSTDeletionTimeSkewed, totalRBTDeletionTimeSkewed, halfIterations);
             printAverages(size, "Non-Skewed", totalBSTInsertionTimeNonSkewed, totalRBTInsertionTimeNonSkewed, totalBSTHeightNonSkewed, totalRBTHeightNonSkewed, totalBSTSearchTimeNonSkewed, totalRBTSearchTimeNonSkewed, totalBSTDeletionTimeNonSkewed, totalRBTDeletionTimeNonSkewed, halfIterations);
@@ -180,7 +179,8 @@ public class BenchmarkTrees {
     }
 }
 
-
+// Benchmarking results that report is based on.
+//
 // Size: 200, Data Type: Skewed
 // -------------------------------------------------
 // BST Insertion Average Time: 0.000039 ms, Average Height: 199
@@ -291,4 +291,3 @@ public class BenchmarkTrees {
 // BST Deletion Average Time: 0.000155 ms
 // RBT Deletion Average Time: 0.000289 ms
 // -------------------------------------------------
-// Done
