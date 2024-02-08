@@ -28,27 +28,28 @@ public class BenchmarkVehicles {
     public String getRegistrationNumber() {
       return registrationNumber;
     }
+
     @Override
     public int hashCode() {
-        int hash = 7;
-        int prime = 31;
-        int letterMultiplier = 73; // A larger prime number for letters
-    
-        for (int i = 0; i < registrationNumber.length(); i++) {
-            char c = registrationNumber.charAt(i);
-            if (Character.isLetter(c)) {
-                // Amplify the effect of letters
-                hash = (hash * letterMultiplier) + c;
-            } else {
-                // For digits, use the original method
-                hash = (hash * prime) + c;
-            }
-            // Optional: Incorporate bit manipulation
-            hash = (hash << 3) ^ (hash >> 5);
+      int hash = 7;
+      int prime = 31;
+      int letterMultiplier = 73; // A larger prime number for letters
+
+      for (int i = 0; i < registrationNumber.length(); i++) {
+        char c = registrationNumber.charAt(i);
+        if (Character.isLetter(c)) {
+          // Amplify the effect of letters
+          hash = (hash * letterMultiplier) + c;
+        } else {
+          // For digits, use the original method
+          hash = (hash * prime) + c;
         }
-        return hash;
+        // Optional: Incorporate bit manipulation
+        hash = (hash << 3) ^ (hash >> 5);
+      }
+      return hash;
     }
-    
+
     @Override
     public boolean equals(Object obj) {
       if (this == obj)
@@ -67,7 +68,7 @@ public class BenchmarkVehicles {
 
   private static final int[] initialCapacities = { 10, 20, 40, 80, 160 };
   private static final int[] vehicles = { 50, 100, 200, 400, 800 };
-  private static final int iterations = 2500;
+  private static final int iterations = 50000;
   private static final DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.US);
   private static final DecimalFormat df = new DecimalFormat("#.0", symbols);
 
@@ -75,46 +76,47 @@ public class BenchmarkVehicles {
     run();
   }
 
+  public static void run() {
+    Random random = new Random();
+    // Assuming df is a DecimalFormat for formatting the output
 
-public static void run() {
-  Random random = new Random();
- // Assuming df is a DecimalFormat for formatting the output
-
-  for (int capacity : initialCapacities) {
+    for (int capacity : initialCapacities) {
       System.out.println("-------------------------------------------------------------------------------");
       System.out.println("Initial Table Capacity: " + capacity);
       System.out.println("-------------------------------------------------------------------------------");
-      System.out.printf("%-15s %-20s %-20s %-20s %n", "Vehicle Count", "Avg Initial Conflicts", "Avg Probing Conflicts", "Avg Total Conflicts");
+      System.out.printf("%-15s %-20s %-20s %-20s %n", "Vehicle Count", "Avg Initial Conflicts", "Avg Probing Conflicts",
+          "Avg Total Conflicts");
       System.out.println("-------------------------------------------------------------------------------");
-  
+
       for (int vehicleCount : vehicles) {
-          long totalInitialConflicts = 0;
-          long totalProbingConflicts = 0;
-          long totalConflicts = 0;
+        long totalInitialConflicts = 0;
+        long totalProbingConflicts = 0;
+        long totalConflicts = 0;
 
-          for (int iteration = 0; iteration < iterations; iteration++) {
-              HashTableQuadraticProbing<Vehicle> vehicleTable = new HashTableQuadraticProbing<>(capacity);
+        for (int iteration = 0; iteration < iterations; iteration++) {
+          HashTableQuadraticProbing<Vehicle> vehicleTable = new HashTableQuadraticProbing<>(capacity);
 
-              for (int i = 0; i < vehicleCount; i++) {
-                  Vehicle vehicle = new Vehicle(random);
-                  vehicleTable.insert(vehicle);
-              }
-
-              totalInitialConflicts += vehicleTable.getInitialConflicts();
-              totalProbingConflicts += vehicleTable.getProbingConflicts();
-              totalConflicts += vehicleTable.getTotalConflicts();
+          for (int i = 0; i < vehicleCount; i++) {
+            Vehicle vehicle = new Vehicle(random);
+            vehicleTable.insert(vehicle);
           }
 
-          // Calculate averages
-          double avgInitialConflicts = (double) totalInitialConflicts / iterations;
-          double avgProbingConflicts = (double) totalProbingConflicts / iterations;
-          double avgTotalConflicts = (double) totalConflicts / iterations;
+          totalInitialConflicts += vehicleTable.getInitialConflicts();
+          totalProbingConflicts += vehicleTable.getProbingConflicts();
+          totalConflicts += vehicleTable.getTotalConflicts();
+        }
 
-          // Print results in a formatted table row
-          System.out.printf("%-15d %-20s %-20s %-20s %n", vehicleCount, df.format(avgInitialConflicts), df.format(avgProbingConflicts), df.format(avgTotalConflicts));
+        // Calculate averages
+        double avgInitialConflicts = (double) totalInitialConflicts / iterations;
+        double avgProbingConflicts = (double) totalProbingConflicts / iterations;
+        double avgTotalConflicts = (double) totalConflicts / iterations;
+
+        // Print results in a formatted table row
+        System.out.printf("%-15d %-20s %-20s %-20s %n", vehicleCount, df.format(avgInitialConflicts),
+            df.format(avgProbingConflicts), df.format(avgTotalConflicts));
       }
       System.out.println("-------------------------------------------------------------------------------\n");
+    }
   }
-}
 
 }

@@ -10,7 +10,7 @@ public class BenchmarkTrees {
 
     private static final int[] sizes = { 200, 400, 800, 1600, 3200 };
     private static final int iterations = 8;
-    private static final int repetitions = 2500;
+    private static final int repetitions = 250;
     private static final DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.US);
     private static final DecimalFormat df = new DecimalFormat("0.000000", symbols);
 
@@ -109,7 +109,7 @@ public class BenchmarkTrees {
                         rbt.add(value);
                     }
                     for (int i = 0; i < randomValues.length / 2; i++) {
-                        rbt.delete(randomValues[i]);
+                        rbt.remove(randomValues[i]);
                     }
                     return null;
                 };
